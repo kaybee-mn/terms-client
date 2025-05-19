@@ -1,0 +1,18 @@
+.textbox {
+  @apply whitespace-pre-wrap p-6 text-tan-5 text-2xl text-left break-words bg-tan-1 shadow-inner shadow-tan-4 rounded-lg h-[55vh] overflow-y-auto focus:outline-none text-wrap w-full;
+}
+
+.textbox-container {
+  @apply bg-tan-3 rounded-lg p-5  w-[75vw] mx-auto mb-8 transition-all duration-500 focus:outline-none;
+}
+
+.textbox-container button{
+  @apply hover:text-tan-5 border-transparent;
+}
+
+button{
+  @apply text-4xl bg-tan-2 px-8 py-4 rounded text-tan-4 border-[0.005rem] border-transparent m-4 h-min duration-200 self-center transition-all;
+}
+.placeholder{
+  @apply absolute top-0 left-0 p-6 pointer-events-none select-none text-2xl text-tan-5/50 ;
+}
