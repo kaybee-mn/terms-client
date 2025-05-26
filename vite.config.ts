@@ -7,4 +7,9 @@ export default defineConfig({
   css: {
     postcss: './postcss.config.js', // Make sure this points to your PostCSS config
   },
+  server: {
+    proxy: {
+      '/api': 'http://localhost:5000',
+    },
+  },
 })
