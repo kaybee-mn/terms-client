@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
 import supabase from "../api/supabaseClient";
-import { Session } from "react-router-dom";
-import { User } from "@supabase/supabase-js";
+import { User,Session } from "@supabase/supabase-js";
 
 type Props = {
   children: ReactNode
@@ -20,7 +19,8 @@ const AppContext = createContext<AuthContextType|undefined>(undefined);
 const AppContextProvider = ({ children }:Props) => {
   let myChannel = null;
   const [user, setUser] = useState<User|null>(null);
-  const [session, setSession] = useState(null);
+  const [username, setUsername] = useState<string|undefined>("");
+  const [session, setSession] = useState<Session|null>(null);
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState("");
   const [loadingInitial, setLoadingInitial] = useState(true);
@@ -76,7 +76,8 @@ const AppContextProvider = ({ children }:Props) => {
 
     let username;
     if (session) {
-      user = session.user;
+      setUser(session.user);
+      username = session.user.user_metadata.username;
     } else {
       username = localStorage.getItem("username") || randomUsername();
     }
