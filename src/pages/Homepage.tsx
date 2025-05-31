@@ -13,10 +13,18 @@ function Homepage() {
     " hover:text-green-4 hover:border-green-3 hover:p-6 hover:text-5xl";
 
   const handleConvert = async () => {
-    const text = displayText.trim();
+    let text = displayText.trim();
     const { data } = await supabase.auth.getSession();
     const token = data?.session?.access_token;
 
+    //clean up text
+    if (!text) {
+      console.error("No text to simplify.");
+      return;
+    }
+    text = text.replace(/\s+/g, ' ').trim();
+    text= new DOMParser().parseFromString(text, "text/html").body.textContent || "";
+    
     if (!token) {
       console.error("No access token found.");
       return;

@@ -1,6 +1,6 @@
 const simplifyText = async (text: string, token: string) => {
   try {
-    const res = await fetch('http://localhost:3001/api/simplify', {
+    const res = await fetch('http://localhost:5000/api/simplify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
