@@ -5,6 +5,7 @@ import supabase from "../api/supabaseClient";
 function Homepage() {
   const [displayText, setDisplayText] = useState<string>("");
   const [simplifications, setSimplifications] = useState<string[]>([]);
+  const [title, setTitle] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
   const [upload, setUpload] = useState(false);
@@ -40,7 +41,7 @@ function Homepage() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ text: displayText }),
     });
@@ -55,15 +56,26 @@ function Homepage() {
     }
 
     let fullText = "";
-
+    let titleCapturing = false;
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
       const chunk = decoder.decode(value, { stream: true });
-      fullText += chunk;
-      updateDisplayText(fullText);
+        fullText += chunk;
+      if (fullText.includes("TITLE:")) {
+        // get start of title
+        let start = fullText.slice(fullText.indexOf("TITLE:") + 6);
+        // cut at end of summary
+        fullText = fullText.slice(0, fullText.indexOf("TITLE:")-1);
+        updateDisplayText(fullText);
+        simplifications.push(fullText);
+        fullText = start;
+        titleCapturing = true;
+      } else if (!titleCapturing) {
+        updateDisplayText(fullText);
+      }
     }
-
+    setTitle(fullText);
     setLoading(false);
   };
 
@@ -87,7 +99,15 @@ function Homepage() {
   const handleUndo = () => {
     if (simplifications.length > 0) {
       const lastSimplification = simplifications.pop();
-      setDisplayText(lastSimplification || "");
+      updateDisplayText(lastSimplification || "");
+    }
+  };
+
+  const handleSave = async () => {
+    const text = displayText.trim();
+    if (!text) {
+      console.error("No text to save.");
+      return;
     }
   };
 
@@ -128,8 +148,18 @@ function Homepage() {
                     handleConvert();
                   }}
                 >
-                  Simplify!{simplifications.length > 2 && " (not recommended)"}
+                  Simplify{simplifications.length > 0 && " Again"}!
+                  {simplifications.length > 2 && " (not recommended)"}
                 </button>
+                {simplifications.length !== 0 && (
+                  <button
+                    onClick={() => {
+                      handleSave();
+                    }}
+                  >
+                    Save
+                  </button>
+                )}
                 {view && (
                   <div className="relative w-full">
                     {/* editable textbox */}
