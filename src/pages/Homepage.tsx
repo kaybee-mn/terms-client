@@ -115,7 +115,11 @@ function Homepage() {
                       onInput={handleInput}
                       className="textbox"
                       style={{ textIndent: "2rem" }}
-                    />
+                    >
+                      {loading&&(<div className="loading">
+                        <div className="loading-spinner"></div>
+                      </div>)}
+                      </div>
                   </div>
                 )}
                 <button
