@@ -20,6 +20,7 @@ function Homepage() {
     let text = displayText.trim();
     const { data } = await supabase.auth.getSession();
     const token = data?.session?.access_token;
+    simplifications.push(text);
     //console.log("Token:", token);
     //clean up text
     if (!text) {
@@ -61,14 +62,13 @@ function Homepage() {
       const { done, value } = await reader.read();
       if (done) break;
       const chunk = decoder.decode(value, { stream: true });
-        fullText += chunk;
+      fullText += chunk;
       if (fullText.includes("TITLE:")) {
         // get start of title
         let start = fullText.slice(fullText.indexOf("TITLE:") + 6);
         // cut at end of summary
-        fullText = fullText.slice(0, fullText.indexOf("TITLE:")-1);
+        fullText = fullText.slice(0, fullText.indexOf("TITLE:") - 2);
         updateDisplayText(fullText);
-        simplifications.push(fullText);
         fullText = start;
         titleCapturing = true;
       } else if (!titleCapturing) {
@@ -98,8 +98,11 @@ function Homepage() {
 
   const handleUndo = () => {
     if (simplifications.length > 0) {
-      const lastSimplification = simplifications.pop();
-      updateDisplayText(lastSimplification || "");
+      setSimplifications((prev) => {
+        const copy = [...prev];
+        updateDisplayText(copy.pop() || "");
+        return copy;
+      });
     }
   };
 
@@ -134,7 +137,7 @@ function Homepage() {
               </div>
             ) : (
               <div className={view ? "textbox-container" : "self-center"}>
-                {simplifications.length !== 0 && (
+                {simplifications.length > 0 && (
                   <button
                     onClick={() => {
                       handleUndo();
