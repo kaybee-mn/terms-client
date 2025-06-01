@@ -5,6 +5,7 @@ import supabase from "../api/supabaseClient";
 function Homepage() {
   const [displayText, setDisplayText] = useState<string>("");
   const [simplifications, setSimplifications] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
   const [upload, setUpload] = useState(false);
   const [view, setView] = useState(false);
@@ -12,30 +13,37 @@ function Homepage() {
   const btnUnclicked =
     " hover:text-green-4 hover:border-green-3 hover:p-6 hover:text-5xl";
 
+  const ref = useRef<HTMLDivElement>(null);
+
   const handleConvert = async () => {
     let text = displayText.trim();
     const { data } = await supabase.auth.getSession();
     const token = data?.session?.access_token;
-
+    console.log("Token:", token);
     //clean up text
     if (!text) {
       console.error("No text to simplify.");
       return;
     }
-    text = text.replace(/\s+/g, ' ').trim();
-    text= new DOMParser().parseFromString(text, "text/html").body.textContent || "";
-    
+    text = text.replace(/\s+/g, " ").trim();
+    text =
+      new DOMParser().parseFromString(text, "text/html").body.textContent || "";
+
     if (!token) {
       console.error("No access token found.");
       return;
     }
-
+    setLoading(true);
     const simplified = await simplifyText(text, token);
+    setLoading(false);
     console.log(simplified);
+    if (ref.current) {
+      ref.current.innerText = simplified.content || "";
+    }
+    setDisplayText(simplified.content || "");
   };
 
   const [isEmpty, setIsEmpty] = useState(true);
-  const ref = useRef<HTMLDivElement>(null);
 
   const handleInput = () => {
     if (!ref.current) return;
