@@ -19,7 +19,7 @@ function Homepage() {
     let text = displayText.trim();
     const { data } = await supabase.auth.getSession();
     const token = data?.session?.access_token;
-    console.log("Token:", token);
+    //console.log("Token:", token);
     //clean up text
     if (!text) {
       console.error("No text to simplify.");
@@ -33,14 +33,46 @@ function Homepage() {
       console.error("No access token found.");
       return;
     }
+    updateDisplayText("");
     setLoading(true);
-    const simplified = await simplifyText(text, token);
-    setLoading(false);
-    console.log(simplified);
-    if (ref.current) {
-      ref.current.innerText = simplified.content || "";
+
+    const response = await fetch("/api/simplify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ text: displayText }),
+    });
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder("utf-8");
+
+    if (!reader) {
+      console.error("No stream reader found");
+      setLoading(false);
+      return;
     }
-    setDisplayText(simplified.content || "");
+
+    let fullText = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      fullText += chunk;
+      updateDisplayText(fullText);
+    }
+
+    setLoading(false);
+  };
+
+  const updateDisplayText = (text: string) => {
+    if (ref.current) {
+      ref.current.innerHTML = text;
+    } else {
+      setDisplayText(text);
+    }
   };
 
   const [isEmpty, setIsEmpty] = useState(true);
@@ -114,12 +146,13 @@ function Homepage() {
                       ref={ref}
                       onInput={handleInput}
                       className="textbox"
-                      style={{ textIndent: "2rem" }}
-                    >
-                      {loading&&(<div className="loading">
+                    ></div>
+
+                    {loading && (
+                      <div className="loading">
                         <div className="loading-spinner"></div>
-                      </div>)}
                       </div>
+                    )}
                   </div>
                 )}
                 <button
