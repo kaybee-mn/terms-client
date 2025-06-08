@@ -176,7 +176,7 @@ function Homepage() {
               </div>
             ) : (
               <div className={view ? "textbox-container" : "self-center"}>
-                <Dropdown name="provider" ></Dropdown>
+                <Dropdown items={["hi","hi"]} setValue={setTitle} values={title}></Dropdown>
                 <button
                   onClick={() => {
                     handleConvert();

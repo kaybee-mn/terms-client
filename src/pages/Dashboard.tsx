@@ -91,7 +91,7 @@ export default function Dashboard() {
                   toggle={showDropdowns.provider1}
                   items={Object.keys(data)}
                   values={provValues.provider1}
-                  setValues={(val:string)=>updateProv(val,'provider1')}
+                  setValue={(val:string)=>updateProv(val,'provider1')}
                   setToggle={(val: boolean) => updateDisplay(val, "provider1")}
                 />
 
@@ -99,7 +99,7 @@ export default function Dashboard() {
                   toggle={showDropdowns.date1}
                   items={dateSets.provider1}
                   values={dateValues.date1}
-                  setValues={(val:string)=>updateDate(val,'date1')}
+                  setValue={(val:string)=>updateDate(val,'date1')}
                   setToggle={(val: boolean) => updateDisplay(val, "date1")}
                 />
 
@@ -126,7 +126,7 @@ export default function Dashboard() {
                   toggle={showDropdowns.provider2}
                   items={Object.keys(data)}
                   values={provValues.provider2}
-                  setValues={(val:string)=>updateProv(val,'provider2')}
+                  setValue={(val:string)=>updateProv(val,'provider2')}
                   setToggle={(val: boolean) => updateDisplay(val, "provider2")}
                 />
 
@@ -134,7 +134,7 @@ export default function Dashboard() {
                   toggle={showDropdowns.date2}
                   items={dateSets.provider2}
                   values={dateValues.date2}
-                  setValues={(val:string)=>updateDate(val,'date2')}
+                  setValue={(val:string)=>updateDate(val,'date2')}
                   setToggle={(val: boolean) => updateDisplay(val, "date2")}
                 />
 
