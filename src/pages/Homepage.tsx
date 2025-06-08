@@ -114,6 +114,9 @@ function Homepage() {
   };
 
   const handleSave = async () => {
+    const { data } = await supabase.auth.getSession();
+    const token = data?.session?.access_token;
+    console.log(token);
     const text = displayText.trim();
     if (!text) {
       console.error("No summary or title to save.");
@@ -128,22 +131,22 @@ function Homepage() {
       console.error("User not authenticated.");
       return;
     }
-
-    const response = await fetch("/api/save", {
+    const response = await fetch("/api/simplifications", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         user_id: user.id,
-        title: title||Date.now,
+        title:title||"standin title",
+        // title: title||Date.now(),
         content: text,
       }),
     });
-    const r = await response.json();
 
     if (!response.ok) {
-      console.error("Error saving simplification:", r.error);
+      console.error("Error saving simplification:");
     } else {
       console.log("Simplification saved!");
     }
