@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import simplifyText from "../api/simplify";
 import supabase from "../api/supabaseClient";
+import Dropdown from "../components/Dropdown";
 
 function Homepage() {
   const [displayText, setDisplayText] = useState<string>("");
@@ -139,7 +140,7 @@ function Homepage() {
       },
       body: JSON.stringify({
         user_id: user.id,
-        title:title||"standin title",
+        title: title || "standin title",
         // title: title||Date.now(),
         content: text,
       }),
@@ -175,15 +176,7 @@ function Homepage() {
               </div>
             ) : (
               <div className={view ? "textbox-container" : "self-center"}>
-                {simplifications.length > 0 && (
-                  <button
-                    onClick={() => {
-                      handleUndo();
-                    }}
-                  >
-                    Undo
-                  </button>
-                )}
+                <Dropdown name="provider" ></Dropdown>
                 <button
                   onClick={() => {
                     handleConvert();
@@ -192,15 +185,7 @@ function Homepage() {
                   Simplify{simplifications.length > 0 && " Again"}!
                   {simplifications.length > 2 && " (not recommended)"}
                 </button>
-                {simplifications.length !== 0 && (
-                  <button
-                    onClick={() => {
-                      handleSave();
-                    }}
-                  >
-                    Save
-                  </button>
-                )}
+
                 {view && (
                   <div className="relative w-full">
                     {/* editable textbox */}
@@ -226,6 +211,15 @@ function Homepage() {
                     )}
                   </div>
                 )}
+                {simplifications.length > 0 && (
+                  <button
+                    onClick={() => {
+                      handleUndo();
+                    }}
+                  >
+                    Undo
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setView(false);
@@ -233,6 +227,15 @@ function Homepage() {
                 >
                   Back
                 </button>
+                {simplifications.length !== 0 && (
+                  <button
+                    onClick={() => {
+                      handleSave();
+                    }}
+                  >
+                    Save
+                  </button>
+                )}
               </div>
             )}
           </>
