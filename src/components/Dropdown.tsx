@@ -12,7 +12,7 @@ export default function Dropdown(props: {
   return (
     <div className="col-span-2">
       <button
-        className="bg-tan-2 px-8 py-4 rounded text-tan-4 border-[0.005rem] border-transparent m-4  hover:text-green-4 hover:border-green-3 duration-200 text-xl font-medium  w-11/12 inline-flex items-center text-center justify-center max-w-48"
+        className="bg-tan-2 px-8 py-4 rounded text-tan-4 border-[0.005rem] border-transparent m-4  hover:text-green-4 hover:border-green-3 duration-200 text-xl font-medium  w-11/12 inline-flex items-center text-center justify-center max-w-80"
         type="button"
         onClick={() => {
           setToggle(!toggle);

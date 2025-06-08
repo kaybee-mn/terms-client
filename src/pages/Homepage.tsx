@@ -176,6 +176,7 @@ function Homepage() {
               </div>
             ) : (
               <div className={view ? "textbox-container" : "self-center"}>
+                <div className="flex-shrink items-center grid grid-cols-5">
                 <Dropdown items={["hi","hi"]} setValue={setTitle} values={title}></Dropdown>
                 <button
                   onClick={() => {
@@ -185,6 +186,7 @@ function Homepage() {
                   Simplify{simplifications.length > 0 && " Again"}!
                   {simplifications.length > 2 && " (not recommended)"}
                 </button>
+                </div>
 
                 {view && (
                   <div className="relative w-full">
