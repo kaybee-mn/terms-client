@@ -115,7 +115,7 @@ function Homepage() {
 
   const handleSave = async () => {
     const text = displayText.trim();
-    if (!text || !title) {
+    if (!text) {
       console.error("No summary or title to save.");
       return;
     }
@@ -136,7 +136,7 @@ function Homepage() {
       },
       body: JSON.stringify({
         user_id: user.id,
-        title: title,
+        title: title||Date.now,
         content: text,
       }),
     });
