@@ -45,45 +45,46 @@ function Homepage() {
       body: JSON.stringify({ text: text }),
     });
     updateDisplayText("");
-    // const r = await response.json();
+    // test code
+    const r = await response.json();
 
-    // if (!response.ok) {
-    //   throw new Error(r.error || "Failed to simplify text");
-    // }
-    // updateDisplayText(r.simplified);
-    // setLoading(false);
-    // return;
-
-    const reader = response.body?.getReader();
-    const decoder = new TextDecoder("utf-8");
-
-    if (!reader) {
-      console.error("No stream reader found");
-      setLoading(false);
-      return;
+    if (!response.ok) {
+      throw new Error(r.error || "Failed to simplify text");
     }
-
-    let fullText = "";
-    let titleCapturing = false;
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const chunk = decoder.decode(value, { stream: true });
-      fullText += chunk;
-      if (fullText.includes("TITLE:")) {
-        // get start of title
-        let start = fullText.slice(fullText.indexOf("TITLE:") + 6);
-        // cut at end of summary
-        fullText = fullText.slice(0, fullText.indexOf("TITLE:") - 2);
-        updateDisplayText(fullText);
-        fullText = start;
-        titleCapturing = true;
-      } else if (!titleCapturing) {
-        updateDisplayText(fullText);
-      }
-    }
-    setTitle(fullText);
+    updateDisplayText(r.simplified);
     setLoading(false);
+    return;
+
+    // const reader = response.body?.getReader();
+    // const decoder = new TextDecoder("utf-8");
+
+    // if (!reader) {
+    //   console.error("No stream reader found");
+    //   setLoading(false);
+    //   return;
+    // }
+
+    // let fullText = "";
+    // let titleCapturing = false;
+    // while (true) {
+    //   const { done, value } = await reader.read();
+    //   if (done) break;
+    //   const chunk = decoder.decode(value, { stream: true });
+    //   fullText += chunk;
+    //   if (fullText.includes("TITLE:")) {
+    //     // get start of title
+    //     let start = fullText.slice(fullText.indexOf("TITLE:") + 6);
+    //     // cut at end of summary
+    //     fullText = fullText.slice(0, fullText.indexOf("TITLE:") - 2);
+    //     updateDisplayText(fullText);
+    //     fullText = start;
+    //     titleCapturing = true;
+    //   } else if (!titleCapturing) {
+    //     updateDisplayText(fullText);
+    //   }
+    // }
+    // setTitle(fullText);
+    // setLoading(false);
   };
 
   const updateDisplayText = (text: string) => {
@@ -128,16 +129,21 @@ function Homepage() {
       return;
     }
 
-    const { error: insertError } = await supabase
-      .from("simplifications")
-      .insert({
+    const response = await fetch("/api/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
         user_id: user.id,
-        title,
+        title: title,
         content: text,
-      });
+      }),
+    });
+    const r = await response.json();
 
-    if (insertError) {
-      console.error("Error saving simplification:", insertError.message);
+    if (!response.ok) {
+      console.error("Error saving simplification:", r.error);
     } else {
       console.log("Simplification saved!");
     }
