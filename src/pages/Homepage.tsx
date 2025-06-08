@@ -20,7 +20,6 @@ function Homepage() {
     let text = displayText.trim();
     const { data } = await supabase.auth.getSession();
     const token = data?.session?.access_token;
-    simplifications.push(text);
     //console.log("Token:", token);
     //clean up text
     if (!text) {
@@ -30,22 +29,30 @@ function Homepage() {
     text = text.replace(/\s+/g, " ").trim();
     text =
       new DOMParser().parseFromString(text, "text/html").body.textContent || "";
+    simplifications.push(text);
 
     if (!token) {
       console.error("No access token found.");
       return;
     }
-    updateDisplayText("");
     setLoading(true);
-
     const response = await fetch("/api/simplify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ text: displayText }),
+      body: JSON.stringify({ text: text }),
     });
+    updateDisplayText("");
+    // const r = await response.json();
+
+    // if (!response.ok) {
+    //   throw new Error(r.error || "Failed to simplify text");
+    // }
+    // updateDisplayText(r.simplified);
+    // setLoading(false);
+    // return;
 
     const reader = response.body?.getReader();
     const decoder = new TextDecoder("utf-8");
@@ -82,9 +89,8 @@ function Homepage() {
   const updateDisplayText = (text: string) => {
     if (ref.current) {
       ref.current.innerHTML = text;
-    } else {
-      setDisplayText(text);
     }
+    setDisplayText(text);
   };
 
   const [isEmpty, setIsEmpty] = useState(true);
@@ -108,9 +114,32 @@ function Homepage() {
 
   const handleSave = async () => {
     const text = displayText.trim();
-    if (!text) {
-      console.error("No text to save.");
+    if (!text || !title) {
+      console.error("No summary or title to save.");
       return;
+    }
+
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+    if (error || !user) {
+      console.error("User not authenticated.");
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from("simplifications")
+      .insert({
+        user_id: user.id,
+        title,
+        content: text,
+      });
+
+    if (insertError) {
+      console.error("Error saving simplification:", insertError.message);
+    } else {
+      console.log("Simplification saved!");
     }
   };
 
