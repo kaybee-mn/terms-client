@@ -12,7 +12,7 @@ export default function Dropdown(props: {
   return (
     <div className="col-span-2">
       <button
-        className="bg-tan-2 px-8 py-4 rounded text-tan-4 border-[0.005rem] border-transparent m-4  hover:text-green-4 hover:border-green-3 duration-200 text-xl font-medium  w-11/12 inline-flex items-center text-center justify-center max-w-80"
+        className="bg-tan-2 px-8 py-4 rounded text-tan-4 border-[0.005rem] border-transparent m-4  hover:text-green-4 hover:border-green-3 duration-200 text-xl font-medium  w-11/12 inline-flex items-center text-center justify-center "
         type="button"
         onClick={() => {
           setToggle(!toggle);
@@ -37,7 +37,7 @@ export default function Dropdown(props: {
       </button>
       {/* <!-- Dropdown menu --> */}
       {toggle && (
-        <div className="ml-3 lg:w-2/12  sm:w-4/12 min-w-[150px] z-10  bg-tan-1 divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 absolute">
+        <div className="ml-3 lg:w-50%  sm:w-4/12 min-w-[150px] z-10  bg-tan-1 divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 absolute justify-center">
           <ul
             className="py-2 text-sm text-tan-5 dark:text-gray-200"
             aria-labelledby="dropdownDefaultButton"

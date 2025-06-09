@@ -4,13 +4,44 @@ import supabase from "../api/supabaseClient";
 import Dropdown from "../components/Dropdown";
 
 function Homepage() {
+  const titlesRef = useRef<string[]>([]);
+  const user_token = useRef<string | null>(null);
+  // const user_id = useRef<string | null>(null);
   const [displayText, setDisplayText] = useState<string>("");
   const [simplifications, setSimplifications] = useState<string[]>([]);
-  const [title, setTitle] = useState<string>("");
+  const [title, setTitle] = useState<string>("New Document");
   const [loading, setLoading] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
   const [upload, setUpload] = useState(false);
   const [view, setView] = useState(false);
+
+  useEffect(() => {
+    const loadToken = async () => {
+      const { data } = await supabase.auth.getSession();
+      user_token.current = data?.session?.access_token ?? null;
+      // console.log(user_token.current);
+    };
+    const fetchTitles = async () => {
+      titlesRef.current = [];
+      const result = await fetch("/api/simplifications/titles", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${user_token.current}`,
+        },
+      });
+      const {data} = await result.json();
+      if (data && Array.isArray(data)) {
+        data.map((title) => {
+          titlesRef.current.push(title.title);
+        });
+      }
+    };
+    const init = async () => {
+      await loadToken();
+      await fetchTitles();
+    };
+    init();
+  }, []);
 
   const btnUnclicked =
     " hover:text-green-4 hover:border-green-3 hover:p-6 hover:text-5xl";
@@ -19,8 +50,7 @@ function Homepage() {
 
   const handleConvert = async () => {
     let text = displayText.trim();
-    const { data } = await supabase.auth.getSession();
-    const token = data?.session?.access_token;
+
     //console.log("Token:", token);
     //clean up text
     if (!text) {
@@ -32,16 +62,12 @@ function Homepage() {
       new DOMParser().parseFromString(text, "text/html").body.textContent || "";
     simplifications.push(text);
 
-    if (!token) {
-      console.error("No access token found.");
-      return;
-    }
     setLoading(true);
     const response = await fetch("/api/simplify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${user_token.current}`,
       },
       body: JSON.stringify({ text: text }),
     });
@@ -115,33 +141,20 @@ function Homepage() {
   };
 
   const handleSave = async () => {
-    const { data } = await supabase.auth.getSession();
-    const token = data?.session?.access_token;
-    console.log(token);
     const text = displayText.trim();
     if (!text) {
       console.error("No summary or title to save.");
       return;
     }
 
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-    if (error || !user) {
-      console.error("User not authenticated.");
-      return;
-    }
     const response = await fetch("/api/simplifications", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${user_token.current}`,
       },
       body: JSON.stringify({
-        user_id: user.id,
-        title: title || "standin title",
-        // title: title||Date.now(),
+        title: title || new Date().toLocaleString(),
         content: text,
       }),
     });
@@ -176,16 +189,21 @@ function Homepage() {
               </div>
             ) : (
               <div className={view ? "textbox-container" : "self-center"}>
-                <div className="flex-shrink items-center grid grid-cols-5">
-                <Dropdown items={["hi","hi"]} setValue={setTitle} values={title}></Dropdown>
-                <button
-                  onClick={() => {
-                    handleConvert();
-                  }}
-                >
-                  Simplify{simplifications.length > 0 && " Again"}!
-                  {simplifications.length > 2 && " (not recommended)"}
-                </button>
+                <div className="flex-shrink items-center grid grid-cols-6">
+                  <Dropdown
+                    items={["New Document", ...titlesRef.current]}
+                    setValue={setTitle}
+                    values={title || "New Document"}
+                  ></Dropdown>
+                  <button
+                    onClick={() => {
+                      handleConvert();
+                    }}
+                    className="col-span-2"
+                  >
+                    Simplify{simplifications.length > 0 && " Again"}!
+                    {simplifications.length > 2 && " (not recommended)"}
+                  </button>
                 </div>
 
                 {view && (
