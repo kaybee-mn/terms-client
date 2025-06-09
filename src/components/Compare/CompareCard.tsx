@@ -3,13 +3,13 @@ import Toggle from "../Toggle";
 import { useEffect, useState } from "react";
 import supabase from "../../api/supabaseClient";
 
-export default function CompareCard(
-    docList:string[]
+export default function CompareCard(props:
+    {docList:string[]}
 ){
     const [doc,setDoc]=useState<number>(0);
     const [version,setVersion]=useState<string>("");
     const [versionList,setVersionList]=useState<Map<string,string>>(new Map([]));
-
+console.log(props.docList);
     const getVersionList = async () =>{
       const { data:sbData } = await supabase.auth.getSession();
       const user_token = sbData?.session?.access_token ?? null;
@@ -31,8 +31,8 @@ export default function CompareCard(
             <div className="bg-tan-3 rounded-lg p-5 mx-auto mb-auto mt-0">
               <div className="flex-shrink items-center grid grid-cols-5">
                 <Dropdown
-                  items={docList}
-                  values={docList[doc]}
+                  items={props.docList}
+                  values={props.docList[doc]}
                   setValue={setDoc}
                 />
 
