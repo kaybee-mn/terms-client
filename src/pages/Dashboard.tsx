@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import supabase from "../api/supabaseClient";
 import CompareCard from "../components/Compare/CompareCard";
 
-
 export default function Dashboard() {
   const documentList = useRef<string[]>([]);
-  const [loading,setLoading]= useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchDocs = async () => {
+      documentList.current = [];
+
       const { data: sbData } = await supabase.auth.getSession();
       const user_token = sbData?.session?.access_token ?? null;
       documentList.current = [];
@@ -24,24 +25,29 @@ export default function Dashboard() {
           documentList.current.push(title.title);
         });
       }
-      console.log(documentList)
+      console.log(documentList);
       setLoading(false);
     };
-    const init = async()=>{
+    const init = async () => {
       await fetchDocs();
-    }
+    };
     init();
   }, []);
 
-
   return (
     <div className="overflow-hidden flex  ">
-      <div className="text-center mt-[5rem] w-full justify-between content-start ">
-        <div className=" grid lg:grid-cols-2 sm:grid-cols-1 gap-8 m-7 ">
-          <CompareCard docList={documentList.current} />
-          <CompareCard docList={documentList.current} />
+      {loading ? (
+        <div className="loading">
+          <div className="loading-spinner"></div>
         </div>
-      </div>
+      ) : (
+        <div className="text-center mt-[5rem] w-full justify-between content-start ">
+          <div className=" grid lg:grid-cols-2 sm:grid-cols-1 gap-8 m-7 ">
+            <CompareCard docList={documentList.current} />
+            <CompareCard docList={documentList.current} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
