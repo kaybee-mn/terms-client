@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import supabase from "../api/supabaseClient";
 import CompareCard from "../components/Compare/CompareCard";
 
@@ -25,7 +25,6 @@ export default function Dashboard() {
           documentList.current.push(title.title);
         });
       }
-      console.log(documentList);
       setLoading(false);
     };
     const init = async () => {
