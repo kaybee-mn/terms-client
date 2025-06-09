@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Dropdown from "../components/Dropdown";
 import Toggle from "../components/Toggle";
 
 import data from "../seeds/Dashboard.json";
+import CompareCard from "../components/Compare/CompareCard";
 
 interface DashboardData {
   [key: string]: {
@@ -18,6 +19,7 @@ interface DashboardData {
 const typedData: DashboardData = data;
 
 export default function Dashboard() {
+  const documentList = useRef<string[]>([]);
   const [showDropdowns, setShowDropdowns] = useState<{
     [key: string]: boolean;
   }>({
@@ -84,6 +86,9 @@ export default function Dashboard() {
     <div className="overflow-hidden flex  ">
       <div className="text-center mt-[5rem] w-full justify-between content-start ">
         <div className=" grid lg:grid-cols-2 sm:grid-cols-1 gap-8 m-7 ">
+          <CompareCard
+            docList={}
+          />
           <div className="sm:w-full  ">
             <div className="bg-tan-3 rounded-lg p-5 mx-auto mb-auto mt-0">
               <div className="flex-shrink items-center grid grid-cols-5">
@@ -119,40 +124,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="sm:w-full  ">
-            <div className="bg-tan-3 rounded-lg p-5 mx-auto mb-auto mt-0">
-              <div className="flex-shrink items-center grid grid-cols-5">
-                <Dropdown
-                  toggle={showDropdowns.provider2}
-                  items={Object.keys(data)}
-                  values={provValues.provider2}
-                  setValue={(val:string)=>updateProv(val,'provider2')}
-                  setToggle={(val: boolean) => updateDisplay(val, "provider2")}
-                />
-
-                <Dropdown
-                  toggle={showDropdowns.date2}
-                  items={dateSets.provider2}
-                  values={dateValues.date2}
-                  setValue={(val:string)=>updateDate(val,'date2')}
-                  setToggle={(val: boolean) => updateDisplay(val, "date2")}
-                />
-
-                <Toggle
-                  name="toggle2"
-                  toggle={showDropdowns.toggle2}
-                  setShowDropdowns={setShowDropdowns}
-                  showDropdowns={showDropdowns}
-                />
-              </div>
-
-              <div className="whitespace-pre-wrap bg-tan-1 shadow-inner shadow-tan-4 rounded-lg p-4 h-[33vh] lg:h-[70vh]  overflow-y-auto scrollbar-thick scrollbar-thumb-blue-500 scrollbar-track-blue-100 ">
-                <p className="p-3 text-tan-5 text-2xl text-left">
-                  {renderContent2()}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
