@@ -1,6 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Dropdown from "../components/Dropdown";
 import Toggle from "../components/Toggle";
+import supabase from "../api/supabaseClient";
 
 import data from "../seeds/Dashboard.json";
 import CompareCard from "../components/Compare/CompareCard";
@@ -20,6 +21,27 @@ const typedData: DashboardData = data;
 
 export default function Dashboard() {
   const documentList = useRef<string[]>([]);
+
+  useEffect(() => {
+    const fetchDocs = async () => {
+      const { data:sbData } = await supabase.auth.getSession();
+      const user_token = sbData?.session?.access_token ?? null;
+      documentList.current = [];
+      const result = await fetch("/api/simplifications/titles", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${user_token}`,
+        },
+      });
+      const { data } = await result.json();
+      if (data && Array.isArray(data)) {
+        data.map((title) => {
+          documentList.current.push(title.title);
+        });
+      }
+    };
+    fetchDocs();
+  }, []);
   const [showDropdowns, setShowDropdowns] = useState<{
     [key: string]: boolean;
   }>({
@@ -86,9 +108,7 @@ export default function Dashboard() {
     <div className="overflow-hidden flex  ">
       <div className="text-center mt-[5rem] w-full justify-between content-start ">
         <div className=" grid lg:grid-cols-2 sm:grid-cols-1 gap-8 m-7 ">
-          <CompareCard
-            docList={}
-          />
+          <CompareCard docList={} />
           <div className="sm:w-full  ">
             <div className="bg-tan-3 rounded-lg p-5 mx-auto mb-auto mt-0">
               <div className="flex-shrink items-center grid grid-cols-5">
@@ -96,7 +116,7 @@ export default function Dashboard() {
                   toggle={showDropdowns.provider1}
                   items={Object.keys(data)}
                   values={provValues.provider1}
-                  setValue={(val:string)=>updateProv(val,'provider1')}
+                  setValue={(val: string) => updateProv(val, "provider1")}
                   setToggle={(val: boolean) => updateDisplay(val, "provider1")}
                 />
 
@@ -104,7 +124,7 @@ export default function Dashboard() {
                   toggle={showDropdowns.date1}
                   items={dateSets.provider1}
                   values={dateValues.date1}
-                  setValue={(val:string)=>updateDate(val,'date1')}
+                  setValue={(val: string) => updateDate(val, "date1")}
                   setToggle={(val: boolean) => updateDisplay(val, "date1")}
                 />
 
@@ -123,7 +143,6 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import Dropdown from "../Dropdown";
 import Toggle from "../Toggle";
 import { useEffect, useState } from "react";
+import supabase from "../../api/supabaseClient";
 
 export default function CompareCard(
     docList:string[]
@@ -10,12 +11,19 @@ export default function CompareCard(
     const [versionList,setVersionList]=useState<Map<string,string>>(new Map([]));
 
     const getVersionList = async () =>{
-        const res = await fetch(`api/simplifications/titles/${doc}`)
-
+      const { data:sbData } = await supabase.auth.getSession();
+      const user_token = sbData?.session?.access_token ?? null;
+        const res = await fetch(`api/simplifications/titles/${doc}`,{
+            method:"GET",
+            headers:{
+                Authorization: `Bearer ${user_token}`
+            }
+        })
+        console.log(res);
     }
 
     useEffect(()=>{
-        
+        getVersionList();
     },[])
 
     return (
