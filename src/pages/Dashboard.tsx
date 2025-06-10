@@ -8,11 +8,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchDocs = async () => {
-      documentList.current = [];
-
       const { data: sbData } = await supabase.auth.getSession();
       const user_token = sbData?.session?.access_token ?? null;
       documentList.current = [];
+      console.log(documentList)
       const result = await fetch("/api/simplifications/titles", {
         method: "GET",
         headers: {

@@ -12,21 +12,23 @@ export default function CompareCard(props: { docList: string[] }) {
   const getVersionList = async () => {
     const { data: sbData } = await supabase.auth.getSession();
     const user_token = sbData?.session?.access_token ?? null;
-    const res = await fetch(`api/simplifications/titles/${doc +1}`, {
+    const res = await fetch(`api/simplifications/titles/${doc + 1}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${user_token}`,
       },
     });
-    const {data}=await res.json();
-    data.map((ob:any,index:number)=>{
-        setVersionList(versionList.set(ob.timestamp,ob.content))
-        if(index===1){
-            setVersion(ob.timestamp)
-        }
-    })
-    setVersion(versionList[0]);
-    console.log(versionList)
+    const { data } = await res.json();
+    data.map((ob: any, index: number) => {
+      const date = new Date(ob.timestamp).toLocaleString("en-US", {
+        dateStyle: "long",
+        timeStyle: "short",
+      });
+      setVersionList(versionList.set(date, ob.content));
+      if (index === 1) {
+        setVersion(date);
+      }
+    });
   };
 
   useEffect(() => {
