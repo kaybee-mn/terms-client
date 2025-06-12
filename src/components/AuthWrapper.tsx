@@ -27,7 +27,7 @@ export default function AuthWrapper({ children }: Props) {
   if (!session) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <Auth supabaseClient={supabase}  appearance={{theme:ThemeSupa}}/>
+        <Auth supabaseClient={supabase}  appearance={{theme:ThemeSupa}} providers={['google']} view="sign_in"/>
       </div>
     )
   }

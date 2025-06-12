@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import supabase from "../api/supabaseClient";
 import CompareCard from "../components/Compare/CompareCard";
+import AuthWrapper from "../components/AuthWrapper";
 
-export default function Dashboard() {
+export default function History() {
   const documentList = useRef<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -33,6 +34,8 @@ export default function Dashboard() {
   }, []);
 
   return (
+    
+        <AuthWrapper>
     <div className="overflow-hidden flex  ">
       {loading ? (
         <div className="loading">
@@ -41,11 +44,12 @@ export default function Dashboard() {
       ) : (
         <div className="text-center mt-[5rem] w-full justify-between content-start ">
           <div className=" grid lg:grid-cols-2 sm:grid-cols-1 gap-8 m-7 ">
-            <CompareCard docList={documentList.current} />
-            <CompareCard docList={documentList.current} />
+            <CompareCard docList={documentList.current} id={1}/>
+            <CompareCard docList={documentList.current} id={2}/>
           </div>
         </div>
       )}
     </div>
+    </AuthWrapper>
   );
 }

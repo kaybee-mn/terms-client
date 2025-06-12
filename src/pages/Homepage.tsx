@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import simplifyText from "../api/simplify";
 import supabase from "../api/supabaseClient";
 import Dropdown from "../components/Dropdown";
+import { Link } from "react-router-dom";
 
 function Homepage() {
   const titlesRef = useRef<string[]>([]);
@@ -170,9 +171,17 @@ function Homepage() {
     <div className="min-h-screen flex y-overflow-auto justify-center text-center ">
       <div className="self-center pt-[9vh]">
         {!upload ? (
+          <div>
           <button className={btnUnclicked} onClick={() => setUpload(!upload)}>
-            Get Started!
+            Simplify!
           </button>
+          <br/>
+          <button className={btnUnclicked} onClick={() => setUpload(!upload)}>
+            <Link to="/history">
+            Compare Docs
+            </Link>
+          </button>
+          </div>
         ) : (
           <>
             {!view ? (
