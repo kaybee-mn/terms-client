@@ -14,14 +14,15 @@ export default function Avatar(props: {
 
   async function downloadImage(path: string) {
     try {
-      const { data, error } = await supabase.storage
+      const { data} = await supabase.storage
         .from("avatars")
-        .download(path);
-      if (error) {
-        throw error;
+        .createSignedUrl(path, 60 * 60); 
+      if (!data?.signedUrl) {
+        console.log("no public url. path:",path)
+        return
       }
-      const url = URL.createObjectURL(data);
-      setAvatarUrl(url);
+    //   const url = URL.createObjectURL(data.publicUrl);
+      setAvatarUrl(`${data.signedUrl}&cb=${Date.now()}`);
     } catch (error) {
       console.log("Error downloading image");
     }
@@ -39,21 +40,20 @@ export default function Avatar(props: {
       const file = event.target.files[0];
       const fileExt = file.name.split(".").pop();
       const fileName = `profile.${fileExt}`;
-      const filePath = `${userId}/${fileName}`;
+      const filePath = `${userId}/profile.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from("avatars")
-        .upload(filePath, file,{
-            upsert:true
+        .upload(filePath, file, {
+          upsert: true,
         });
 
       if (uploadError) {
         throw uploadError;
       }
-
       await downloadImage(filePath);
       props.onUpload(event, filePath);
-    } catch (error:any) {
+    } catch (error: any) {
       alert(error.message);
     } finally {
       setUploading(false);
@@ -63,7 +63,7 @@ export default function Avatar(props: {
   return (
     <div>
       <img
-        src={avatarUrl ? avatarUrl : "/default_pfp.webp"}
+        src={avatarUrl || "/default_pfp.webp"}
         alt="Avatar"
         className="aspect-square w-40 rounded-full object-cover"
       />
