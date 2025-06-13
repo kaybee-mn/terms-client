@@ -1,14 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../api/supabaseClient";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { Session } from "@supabase/supabase-js";
 
 export default function ProfileIcon(props: {
   userMenu: boolean;
   setUserMenu: any;
-  session: Session|undefined;
+  session: Session | undefined;
 }) {
-    const navigate = useNavigate();
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const navigate = useNavigate();
   const handleClick = () => {
     const isBelowBreakpoint = window.matchMedia("(max-width: 1023px)").matches;
     if (isBelowBreakpoint) {
@@ -26,14 +27,31 @@ export default function ProfileIcon(props: {
     } else {
       // Logged out alert
     }
-    navigate('/');
+    navigate("/");
   };
+  useEffect(() => {
+    async function downloadImage(path: string) {
+      try {
+        const { data } = await supabase.storage
+          .from("avatars")
+          .createSignedUrl(path, 60 * 60);
+        if (!data?.signedUrl) {
+          console.log("no public url. path:", path);
+          return;
+        }
+        //   const url = URL.createObjectURL(data.publicUrl);
+        setAvatarUrl(`${data.signedUrl}&cb=${Date.now()}`);
+      } catch (error) {
+        console.log("Error downloading image");
+      }
+    }
+  },[]);
 
   function MenuItem(props: { text: string }) {
     return (
       <Link
         className="block px-4 py-2 text-md text-green-5 hover:text-green-3"
-        to={ `/${props.text}`}
+        to={`/${props.text}`}
         onClick={props.text === "Logout" ? handleLogout : undefined}
       >
         {props.text}
@@ -57,7 +75,13 @@ export default function ProfileIcon(props: {
             aria-expanded="false"
             aria-haspopup="true"
             onMouseEnter={() => props.setUserMenu(true)}
-            onClick={!props.session?(()=>{navigate('/history')}):undefined}
+            onClick={
+              !props.session
+                ? () => {
+                    navigate("/history");
+                  }
+                : undefined
+            }
           >
             <span className="sr-only">Open user menu</span>
             <img
@@ -69,7 +93,7 @@ export default function ProfileIcon(props: {
         </div>
 
         {/* Profile dropdown */}
-        {(props.userMenu && props.session) && (
+        {props.userMenu && props.session && (
           <div
             className="hidden lg:block absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-tan-2 py-1 shadow-lg ring-1 ring-green-5 ring-opacity-5 focus:outline-none"
             role="menu"

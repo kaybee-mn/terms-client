@@ -3,15 +3,21 @@ import { useState, useEffect } from "react";
 import supabase from "../api/supabaseClient";
 import Avatar from "../components/Settings/Avatar";
 import { Session } from "@supabase/supabase-js";
+import Toggle from "../components/Toggle";
 
 export default function Settings() {
   const [session, setSession] = useState<Session | null>();
   const [loading, setLoading] = useState(true);
   const [avatar_url, setAvatarUrl] = useState<string>("");
+  const [highContrast,setHighContrast] = useState<boolean>(false);
+
   useEffect(() => {
     async function getSession() {
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
+    }
+    async function name(params:type) {
+      
     }
 
     getSession();
@@ -81,6 +87,7 @@ export default function Settings() {
               }}
             />
           </div>
+          <Toggle toggle={highContrast} setToggle={setHighContrast}/>
           <div>
             <label htmlFor="email">Email</label>
             <input
