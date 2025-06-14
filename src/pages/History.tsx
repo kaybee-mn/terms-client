@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import supabase from "../api/supabaseClient";
 import CompareCard from "../components/Compare/CompareCard";
-import AuthWrapper from "../components/AuthWrapper";
+import AuthWrapper from "../context/AuthContext";
 
 export default function History() {
   const documentList = useRef<string[]>([]);
@@ -12,7 +12,7 @@ export default function History() {
       const { data: sbData } = await supabase.auth.getSession();
       const user_token = sbData?.session?.access_token ?? null;
       documentList.current = [];
-      console.log(documentList)
+      console.log(documentList);
       const result = await fetch("/api/simplifications/titles", {
         method: "GET",
         headers: {
@@ -34,22 +34,21 @@ export default function History() {
   }, []);
 
   return (
-    
-        <AuthWrapper>
-    <div className="overflow-hidden flex  ">
-      {loading ? (
-        <div className="loading">
-          <div className="loading-spinner"></div>
-        </div>
-      ) : (
-        <div className="text-center mt-[5rem] w-full justify-between content-start ">
-          <div className=" grid lg:grid-cols-2 sm:grid-cols-1 gap-8 m-7 ">
-            <CompareCard docList={documentList.current} id={1}/>
-            <CompareCard docList={documentList.current} id={2}/>
+    <AuthWrapper>
+      <div className="overflow-hidden flex  ">
+        {loading ? (
+          <div className="loading">
+            <div className="loading-spinner"></div>
           </div>
-        </div>
-      )}
-    </div>
+        ) : (
+          <div className="text-center mt-[5rem] w-full justify-between content-start ">
+            <div className=" grid lg:grid-cols-2 sm:grid-cols-1 gap-8 m-7 ">
+              <CompareCard docList={documentList.current} id={1} />
+              <CompareCard docList={documentList.current} id={2} />
+            </div>
+          </div>
+        )}
+      </div>
     </AuthWrapper>
   );
 }

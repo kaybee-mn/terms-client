@@ -1,4 +1,4 @@
-import AuthWrapper from "../components/AuthWrapper";
+import AuthWrapper from "../context/AuthContext";
 import { useState, useEffect } from "react";
 import supabase from "../api/supabaseClient";
 import Avatar from "../components/Settings/Avatar";
@@ -9,15 +9,12 @@ export default function Settings() {
   const [session, setSession] = useState<Session | null>();
   const [loading, setLoading] = useState(true);
   const [avatar_url, setAvatarUrl] = useState<string>("");
-  const [highContrast,setHighContrast] = useState<boolean>(false);
+  const [highContrast, setHighContrast] = useState<boolean>(false);
 
   useEffect(() => {
     async function getSession() {
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
-    }
-    async function name(params:type) {
-      
     }
 
     getSession();
@@ -31,7 +28,7 @@ export default function Settings() {
       const { user } = session;
       const { data, error } = await supabase
         .from("profiles")
-        .select(`pfp_url`)
+        .select()
         .eq("id", user.id)
         .single();
       if (!ignore) {
@@ -39,6 +36,7 @@ export default function Settings() {
           console.warn(error);
         } else if (data) {
           setAvatarUrl(data.pfp_url);
+          setHighContrast(data.high_contrast_theme);
         }
       }
       setLoading(false);
@@ -58,8 +56,10 @@ export default function Settings() {
     const updates = {
       pfp_url: avatarUrl,
     };
-    const { error } = await supabase.from("profiles").update(updates).eq(
-      "id",user.id,);
+    const { error } = await supabase
+      .from("profiles")
+      .update(updates)
+      .eq("id", user.id);
     if (error) {
       alert(error.message);
     } else {
@@ -87,7 +87,11 @@ export default function Settings() {
               }}
             />
           </div>
-          <Toggle toggle={highContrast} setToggle={setHighContrast}/>
+
+          <span className="ml-3 text-xl font-medium text-green-5 ">
+            {highContrast ? "Simplified" : "Detailed"}
+          </span>
+          <Toggle toggle={highContrast} setToggle={setHighContrast} />
           <div>
             <label htmlFor="email">Email</label>
             <input

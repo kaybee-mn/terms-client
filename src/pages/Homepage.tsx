@@ -3,6 +3,7 @@ import simplifyText from "../api/simplify";
 import supabase from "../api/supabaseClient";
 import Dropdown from "../components/Dropdown";
 import { Link } from "react-router-dom";
+import { useAlert } from "../context/AlertContext";
 
 function Homepage() {
   const titlesRef = useRef<string[]>([]);
@@ -15,6 +16,7 @@ function Homepage() {
   const [file, setFile] = useState<File | null>(null);
   const [upload, setUpload] = useState(false);
   const [view, setView] = useState(false);
+  const {triggerAlert} = useAlert();
 
   useEffect(() => {
     const loadToken = async () => {
@@ -81,6 +83,7 @@ function Homepage() {
     }
     updateDisplayText(r.simplified);
     setLoading(false);
+    triggerAlert("Simplified!")
     return;
 
     // const reader = response.body?.getReader();
@@ -161,9 +164,9 @@ function Homepage() {
     });
 
     if (!response.ok) {
-      console.error("Error saving simplification:");
+      triggerAlert("Error saving simplification");
     } else {
-      console.log("Simplification saved!");
+      triggerAlert("Simplification saved!");
     }
   };
 
