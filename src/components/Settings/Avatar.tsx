@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import supabase from "../../api/supabaseClient";
+import { useUser } from "../../contexts/UserContext";
 
 export default function Avatar(props: {
   url: string;
@@ -7,22 +8,17 @@ export default function Avatar(props: {
 }) {
   const [avatarUrl, setAvatarUrl] = useState<string>(props.url);
   const [uploading, setUploading] = useState(false);
+  const { setAvatarLink,generateAvatarLink,avatarUrl:pfpUrl } = useUser();
 
   useEffect(() => {
-    if (props.url) downloadImage(props.url);
-  }, [props.url]);
+    downloadImage();
+  }, [pfpUrl]);
 
-  async function downloadImage(path: string) {
+  async function downloadImage() {
     try {
-      const { data} = await supabase.storage
-        .from("avatars")
-        .createSignedUrl(path, 60 * 60); 
-      if (!data?.signedUrl) {
-        console.log("no public url. path:",path)
-        return
-      }
-    //   const url = URL.createObjectURL(data.publicUrl);
-      setAvatarUrl(`${data.signedUrl}&cb=${Date.now()}`);
+      const newVal=await generateAvatarLink();
+      console.log(newVal)
+      newVal?setAvatarUrl(newVal):setAvatarUrl("");
     } catch (error) {
       console.log("Error downloading image");
     }
@@ -42,17 +38,9 @@ export default function Avatar(props: {
       const fileName = `profile.${fileExt}`;
       const filePath = `${userId}/profile.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, file, {
-          upsert: true,
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-      await downloadImage(filePath);
-      props.onUpload(event, filePath);
+      await setAvatarLink(filePath, file)
+      await downloadImage();
+      // props.onUpload(event, filePath);
     } catch (error: any) {
       alert(error.message);
     } finally {

@@ -6,6 +6,7 @@ import History from "./pages/History";
 import "./App.css";
 import Settings from "./pages/Settings";
 import { AlertProvider } from "./contexts/AlertContext";
+import { UserProvider } from "./contexts/UserContext";
 
 function App() {
   useEffect(() => {
@@ -14,19 +15,21 @@ function App() {
 
   return (
     <AlertProvider>
-      <div className="bg-homepage-bg bg-cover font-crimson-txt bg-fixed overflow-hidden ">
-        <div className="overflow-hidden h-screen">
-          <Router>
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Homepage />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/settings" element={<Settings />} />
-              {/* <Route path="/login" element={<Login/>} /> */}
-            </Routes>
-          </Router>
+      <UserProvider>
+        <div className="bg-homepage-bg bg-cover font-crimson-txt bg-fixed overflow-hidden ">
+          <div className="overflow-hidden h-screen">
+            <Router>
+              <Navbar />
+              <Routes>
+                <Route path="/" element={<Homepage />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/settings" element={<Settings />} />
+                {/* <Route path="/login" element={<Login/>} /> */}
+              </Routes>
+            </Router>
+          </div>
         </div>
-      </div>
+      </UserProvider>
     </AlertProvider>
   );
 }
