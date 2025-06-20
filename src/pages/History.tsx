@@ -4,14 +4,14 @@ import CompareCard from "../components/Compare/CompareCard";
 import AuthWrapper from "../contexts/AuthContext";
 
 export default function History() {
-  const [documentList, setDocumentList] = useState<string[]>([]);
+  const [documentList, setDocumentList] = useState<Map<string,number>>(new Map([]));
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchDocs = async () => {
       const { data: sbData } = await supabase.auth.getSession();
       const user_token = sbData?.session?.access_token ?? null;
-      console.log(documentList);
+      setDocumentList(new Map([]))
 
       const result = await fetch("/api/simplifications/titles", {
         method: "GET",
@@ -22,8 +22,9 @@ export default function History() {
       // extract data
       const { data } = await result.json();
       if (data && Array.isArray(data)) {
-        const titles = data.map((title) => title.title);
-        setDocumentList(titles);
+        data.map((title) => {
+          setDocumentList(documentList.set(title.title,title.id))
+        });
       }
       setLoading(false);
     };

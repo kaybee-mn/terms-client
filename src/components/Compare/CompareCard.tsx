@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import supabase from "../../api/supabaseClient";
 
-export default function CompareCard(props: { docList: string[]; id: number }) {
-  const [doc, setDoc] = useState<number>(0);
+export default function CompareCard(props: { docList: Map<string,number>; id: number }) {
+  const [doc, setDoc] = useState<string>([...props.docList.keys()][0]);
   const [version, setVersion] = useState<string|null>(null);
   const [versionList, setVersionList] = useState<Map<string, string>>(
     new Map([])
@@ -13,13 +13,14 @@ export default function CompareCard(props: { docList: string[]; id: number }) {
   const getVersionList = async () => {
     const { data: sbData } = await supabase.auth.getSession();
     const user_token = sbData?.session?.access_token ?? null;
-    const res = await fetch(`api/simplifications/titles/${doc + 1}`, {
+    const res = await fetch(`api/simplifications/titles/${props.docList.get(doc)}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${user_token}`,
       },
     });
     const { data } = await res.json();
+    console.log(doc)
     if(data.length<1){
       setVersion(null);
       return;
@@ -45,8 +46,8 @@ export default function CompareCard(props: { docList: string[]; id: number }) {
       <div className="bg-tan-3 rounded-lg p-5 mx-auto mb-auto mt-0">
         <div className="flex-shrink items-center grid grid-cols-5">
           <Dropdown
-            items={props.docList}
-            values={props.docList[doc]}
+            items={[...props.docList.keys()]}
+            values={doc}
             setValue={setDoc}
           />
 
@@ -63,7 +64,7 @@ export default function CompareCard(props: { docList: string[]; id: number }) {
                   showDropdowns={showDropdowns}
                 /> */}
         </div>
-        {props.docList.length > 0 ? (
+        {props.docList.size > 0 ? (
           <div className="whitespace-pre-wrap bg-tan-1 shadow-inner shadow-tan-4 rounded-lg p-4 h-[33vh] lg:h-[70vh]  overflow-y-auto scrollbar-thick scrollbar-thumb-blue-500 scrollbar-track-blue-100 ">
             <p className="p-3 text-tan-5 text-2xl text-left">
               {versionList.get(version)}
