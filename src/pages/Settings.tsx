@@ -82,12 +82,12 @@ export default function Settings() {
           <div className="rounded width-[30%] height-[30%]">
             <Avatar />
           </div>
-
+{/* 
           <span className="ml-3 text-xl font-medium text-green-5 ">
-            {highContrast ? "Simplified" : "Detailed"}
+            High Contrast Mode
           </span>
-          <Toggle toggle={highContrast} setToggle={setHighContrast} />
-          <div>
+          <Toggle toggle={highContrast} setToggle={setHighContrast} /> */}
+          {/* <div>
             <label htmlFor="email">Email</label>
             <input
               id="email"
@@ -104,7 +104,7 @@ export default function Settings() {
             >
               {loading ? "Loading ..." : "Update"}
             </button>
-          </div>
+          </div> */}
         </form>
       </div>
     </AuthWrapper>

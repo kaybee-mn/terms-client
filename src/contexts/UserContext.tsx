@@ -48,7 +48,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const { data } = await supabase.storage
         .from("avatars")
         .createSignedUrl(avatarPath, 60 * 60);
-
+      console.log("hi")
       if (data?.signedUrl) {
         setAvatarUrl(`${data.signedUrl}&cb=${Date.now()}`);
       } else {
@@ -60,6 +60,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [avatarPath]);
 
   const setAvatarLink = async (file: File) => {
+    setAvatarPath("");
     // get supabase filepath, which will always be userid/profile
     const fileExt = file.name.split(".").pop();
     const newPath = `${user.current.id}/profile.${fileExt}`;

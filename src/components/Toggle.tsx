@@ -11,8 +11,8 @@ export default function Toggle(props: {
         <div
           className={
             props.toggle
-              ? "w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-3 dark:peer-focus:ring-green-3 rounded-full peer after:translate-x-full after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-tan-2 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all bg-green-4"
-              : "w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-3 dark:peer-focus:ring-green-3 rounded-full peer after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-tan-2 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all "
+              ? "w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer after:translate-x-full after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-tan-2 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all bg-green-4"
+              : "w-11 h-6 bg-gray-200 peer-focus:outline-none  rounded-full peer after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-tan-2 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all bg-green-3"
           }
           onClick={()=>{props.setToggle(!props.toggle)}}
         ></div>
