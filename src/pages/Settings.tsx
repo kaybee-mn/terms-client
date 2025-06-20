@@ -1,4 +1,4 @@
-import AuthWrapper from "../context/AuthContext";
+import AuthWrapper from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import supabase from "../api/supabaseClient";
 import Avatar from "../components/Settings/Avatar";

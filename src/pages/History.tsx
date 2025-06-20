@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import supabase from "../api/supabaseClient";
 import CompareCard from "../components/Compare/CompareCard";
-import AuthWrapper from "../context/AuthContext";
+import AuthWrapper from "../contexts/AuthContext";
 
 export default function History() {
   const documentList = useRef<string[]>([]);

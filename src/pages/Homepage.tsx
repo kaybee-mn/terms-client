@@ -3,7 +3,7 @@ import simplifyText from "../api/simplify";
 import supabase from "../api/supabaseClient";
 import Dropdown from "../components/Dropdown";
 import { Link } from "react-router-dom";
-import { useAlert } from "../context/AlertContext";
+import { useAlert } from "../contexts/AlertContext";
 
 function Homepage() {
   const titlesRef = useRef<string[]>([]);
@@ -16,7 +16,7 @@ function Homepage() {
   const [file, setFile] = useState<File | null>(null);
   const [upload, setUpload] = useState(false);
   const [view, setView] = useState(false);
-  const {triggerAlert} = useAlert();
+  const { triggerAlert } = useAlert();
 
   useEffect(() => {
     const loadToken = async () => {
@@ -32,7 +32,7 @@ function Homepage() {
           Authorization: `Bearer ${user_token.current}`,
         },
       });
-      const {data} = await result.json();
+      const { data } = await result.json();
       if (data && Array.isArray(data)) {
         data.map((title) => {
           titlesRef.current.push(title.title);
@@ -83,7 +83,7 @@ function Homepage() {
     }
     updateDisplayText(r.simplified);
     setLoading(false);
-    triggerAlert("Simplified!")
+    triggerAlert("Simplified!");
     return;
 
     // const reader = response.body?.getReader();
@@ -175,15 +175,13 @@ function Homepage() {
       <div className="self-center pt-[9vh]">
         {!upload ? (
           <div>
-          <button className={btnUnclicked} onClick={() => setUpload(!upload)}>
-            Simplify!
-          </button>
-          <br/>
-          <button className={btnUnclicked} onClick={() => setUpload(!upload)}>
-            <Link to="/history">
-            Compare Docs
-            </Link>
-          </button>
+            <button className={btnUnclicked} onClick={() => setUpload(!upload)}>
+              Simplify!
+            </button>
+            <br />
+            <button className={btnUnclicked} onClick={() => setUpload(!upload)}>
+              <Link to="/history">Compare Docs</Link>
+            </button>
           </div>
         ) : (
           <>

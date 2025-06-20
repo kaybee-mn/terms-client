@@ -5,7 +5,7 @@ import Navbar from "./components/Navbar";
 import History from "./pages/History";
 import "./App.css";
 import Settings from "./pages/Settings";
-import { AlertProvider } from "./context/AlertContext";
+import { AlertProvider } from "./contexts/AlertContext";
 
 function App() {
   useEffect(() => {
