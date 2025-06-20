@@ -6,7 +6,7 @@ import supabase from "../../api/supabaseClient";
 
 export default function CompareCard(props: { docList: string[]; id: number }) {
   const [doc, setDoc] = useState<number>(0);
-  const [version, setVersion] = useState<string>("");
+  const [version, setVersion] = useState<string|null>(null);
   const [versionList, setVersionList] = useState<Map<string, string>>(
     new Map([])
   );
@@ -20,6 +20,10 @@ export default function CompareCard(props: { docList: string[]; id: number }) {
       },
     });
     const { data } = await res.json();
+    if(data.length<1){
+      setVersion(null);
+      return;
+    }
     data.map((ob: any, index: number) => {
       const date = new Date(ob.timestamp).toLocaleString("en-US", {
         dateStyle: "long",
