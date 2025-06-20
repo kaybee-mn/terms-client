@@ -8,21 +8,7 @@ export default function Avatar(props: {
 }) {
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [uploading, setUploading] = useState(false);
-  const { setAvatarLink,generateAvatarLink,avatarUrl:pfpUrl } = useUser();
-
-  useEffect(() => {
-    downloadImage();
-  }, [pfpUrl]);
-
-  async function downloadImage() {
-    try {
-      const newVal=await generateAvatarLink();
-      console.log(newVal)
-      newVal?setAvatarUrl(newVal):setAvatarUrl("");
-    } catch (error) {
-      console.log("Error downloading image");
-    }
-  }
+  const { setAvatarLink,avatarUrl:pfpUrl } = useUser();
 
   async function uploadAvatar(event: any) {
     try {
@@ -32,14 +18,9 @@ export default function Avatar(props: {
         throw new Error("You must select an image to upload.");
       }
 
-      const userId = (await supabase.auth.getUser()).data.user?.id;
       const file = event.target.files[0];
-      const fileExt = file.name.split(".").pop();
-      const fileName = `profile.${fileExt}`;
-      const filePath = `${userId}/profile.${fileExt}`;
 
-      await setAvatarLink(filePath, file)
-      await downloadImage();
+      await setAvatarLink( file)
       // props.onUpload(event, filePath);
     } catch (error: any) {
       alert(error.message);
@@ -51,7 +32,7 @@ export default function Avatar(props: {
   return (
     <div>
       <img
-        src={avatarUrl || "/default_pfp.webp"}
+        src={pfpUrl || "/default_pfp.webp"}
         alt="Avatar"
         className="aspect-square w-40 rounded-full object-cover"
       />

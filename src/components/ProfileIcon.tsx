@@ -11,7 +11,7 @@ export default function ProfileIcon(props: {
 }) {
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const navigate = useNavigate();
-  const { generateAvatarLink, avatarUrl: pfpUrl } = useUser();
+  const { avatarUrl: pfpUrl } = useUser();
   const handleClick = () => {
     const isBelowBreakpoint = window.matchMedia("(max-width: 1023px)").matches;
     if (isBelowBreakpoint) {
@@ -31,18 +31,6 @@ export default function ProfileIcon(props: {
     }
     navigate("/");
   };
-  async function downloadImage() {
-    try {
-      const newVal = await generateAvatarLink();
-      console.log(newVal);
-      newVal ? setAvatarUrl(newVal) : setAvatarUrl("");
-    } catch (error) {
-      console.log("Error downloading image");
-    }
-  }
-  useEffect(() => {
-    downloadImage();
-  }, [pfpUrl]);
 
   function MenuItem(props: { text: string }) {
     return (
@@ -82,8 +70,8 @@ export default function ProfileIcon(props: {
           >
             <span className="sr-only">Open user menu</span>
             <img
-              className="h-8 w-8 rounded-full"
-              src={avatarUrl || "/default_pfp.webp"}
+              className="h-8 w-8 rounded-full object-cover"
+              src={pfpUrl || "/default_pfp.webp"}
               alt=""
             ></img>
           </button>

@@ -11,33 +11,57 @@ import { useAlert } from "./AlertContext";
 
 const UserContext = createContext<
   | {
-      generateAvatarLink: () => Promise<string | null>;
-      setAvatarLink: (newPath: string, file: File) => Promise<void>;
-      avatarUrl:string;
+      setAvatarLink: (file: File) => Promise<void>;
+      avatarUrl: string;
     }
   | undefined
 >(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const [avatarPath, setAvatarPath] = useState<string>("");
   const { triggerAlert } = useAlert();
   const user = useRef<any>(undefined);
   useEffect(() => {
+    // initialize with old path
     const init = async () => {
+      // get user data
       const { data } = await supabase.auth.getSession();
       user.current = data.session?.user;
+
+      if (!user.current) return;
 
       const { data: d } = await supabase
         .from("profiles")
         .select("pfp_url")
         .eq("id", user.current.id)
         .single();
-      setAvatarUrl(d?.pfp_url);
+      setAvatarPath(d?.pfp_url);
     };
     init();
   }, []);
+  useEffect(() => {
+    const updateAvatarUrl = async () => {
+      if (!avatarPath) return;
 
-  const setAvatarLink = async (newPath: string, file: File) => {
+      const { data } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(avatarPath, 60 * 60);
+
+      if (data?.signedUrl) {
+        setAvatarUrl(`${data.signedUrl}&cb=${Date.now()}`);
+      } else {
+        console.warn("No signed URL for avatarPath:", avatarPath);
+      }
+    };
+
+    updateAvatarUrl();
+  }, [avatarPath]);
+
+  const setAvatarLink = async (file: File) => {
+    const fileExt = file.name.split(".").pop();
+    const newPath = `${user.current.id}/profile.${fileExt}`;
+
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
       return;
@@ -60,26 +84,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       .eq("id", user_id);
     if (error) {
       triggerAlert("Profile update failed");
-    } else {
-      triggerAlert("Successfully updated image!");
-      setAvatarUrl(newPath);
-      console.log("first")
+      return;
     }
-  };
-  const generateAvatarLink = async () => {
-    const { data } = await supabase.storage
-      .from("avatars")
-      .createSignedUrl(avatarUrl, 60 * 60);
-    if (!data?.signedUrl) {
-      console.log("no public url. path:", avatarUrl);
-      return null;
-    }
-    //   const url = URL.createObjectURL(data.publicUrl);
-    return `${data.signedUrl}&cb=${Date.now()}`;
+    triggerAlert("Successfully updated image!");
+    setAvatarPath(newPath);
   };
 
   return (
-    <UserContext.Provider value={{ setAvatarLink, generateAvatarLink, avatarUrl }}>
+    <UserContext.Provider value={{ setAvatarLink, avatarUrl }}>
       {children}
     </UserContext.Provider>
   );
