@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../api/supabaseClient";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
+import { useUser } from "../contexts/UserContext";
 
 export default function ProfileIcon(props: {
   userMenu: boolean;
@@ -10,6 +11,7 @@ export default function ProfileIcon(props: {
 }) {
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const navigate = useNavigate();
+  const { generateAvatarLink, avatarUrl: pfpUrl } = useUser();
   const handleClick = () => {
     const isBelowBreakpoint = window.matchMedia("(max-width: 1023px)").matches;
     if (isBelowBreakpoint) {
@@ -29,23 +31,18 @@ export default function ProfileIcon(props: {
     }
     navigate("/");
   };
-  useEffect(() => {
-    async function downloadImage(path: string) {
-      try {
-        const { data } = await supabase.storage
-          .from("avatars")
-          .createSignedUrl(path, 60 * 60);
-        if (!data?.signedUrl) {
-          console.log("no public url. path:", path);
-          return;
-        }
-        //   const url = URL.createObjectURL(data.publicUrl);
-        setAvatarUrl(`${data.signedUrl}&cb=${Date.now()}`);
-      } catch (error) {
-        console.log("Error downloading image");
-      }
+  async function downloadImage() {
+    try {
+      const newVal = await generateAvatarLink();
+      console.log(newVal);
+      newVal ? setAvatarUrl(newVal) : setAvatarUrl("");
+    } catch (error) {
+      console.log("Error downloading image");
     }
-  },[]);
+  }
+  useEffect(() => {
+    downloadImage();
+  }, [pfpUrl]);
 
   function MenuItem(props: { text: string }) {
     return (
@@ -86,7 +83,7 @@ export default function ProfileIcon(props: {
             <span className="sr-only">Open user menu</span>
             <img
               className="h-8 w-8 rounded-full"
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+              src={avatarUrl || "/default_pfp.webp"}
               alt=""
             ></img>
           </button>

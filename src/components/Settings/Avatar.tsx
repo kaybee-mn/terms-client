@@ -6,7 +6,7 @@ export default function Avatar(props: {
   url: string;
   onUpload: (event: any, url: string) => void;
 }) {
-  const [avatarUrl, setAvatarUrl] = useState<string>(props.url);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const { setAvatarLink,generateAvatarLink,avatarUrl:pfpUrl } = useUser();
 
