@@ -1,29 +1,25 @@
-import { useEffect, useState } from "react";
-import supabase from "../../api/supabaseClient";
+import { useState } from "react";
 import { useUser } from "../../contexts/UserContext";
+import { useAlert } from "../../contexts/AlertContext";
 
-export default function Avatar(props: {
-  url: string;
-  onUpload: (event: any, url: string) => void;
-}) {
-  const [avatarUrl, setAvatarUrl] = useState<string>("");
+export default function Avatar() {
   const [uploading, setUploading] = useState(false);
-  const { setAvatarLink,avatarUrl:pfpUrl } = useUser();
+  const { setAvatarLink, avatarUrl } = useUser();
+  const { triggerAlert } = useAlert();
 
   async function uploadAvatar(event: any) {
     try {
       setUploading(true);
-
+      // check if file exists and is an image
       if (!event.target.files || event.target.files.length === 0) {
         throw new Error("You must select an image to upload.");
       }
 
       const file = event.target.files[0];
-
-      await setAvatarLink( file)
-      // props.onUpload(event, filePath);
+      // sned file to usercontext to update pfp
+      await setAvatarLink(file);
     } catch (error: any) {
-      alert(error.message);
+      triggerAlert(error.message);
     } finally {
       setUploading(false);
     }
@@ -32,7 +28,7 @@ export default function Avatar(props: {
   return (
     <div>
       <img
-        src={pfpUrl || "/default_pfp.webp"}
+        src={avatarUrl || "/default_pfp.webp"}
         alt="Avatar"
         className="aspect-square w-40 rounded-full object-cover"
       />

@@ -40,6 +40,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     };
     init();
   }, []);
+//   get new signed url when path is updated
   useEffect(() => {
     const updateAvatarUrl = async () => {
       if (!avatarPath) return;
@@ -59,15 +60,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [avatarPath]);
 
   const setAvatarLink = async (file: File) => {
+    // get supabase filepath, which will always be userid/profile
     const fileExt = file.name.split(".").pop();
     const newPath = `${user.current.id}/profile.${fileExt}`;
 
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) {
-      return;
-    }
-    const user_id = data.session.user.id;
-    console.log(newPath);
+    // upload to supabase storage
     const { error: uploadError } = await supabase.storage
       .from("avatars")
       .upload(newPath, file, {
@@ -78,10 +75,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       triggerAlert("Upload failed");
       return;
     }
+
+    // update url in supabase table
     const { error } = await supabase
       .from("profiles")
       .update({ pfp_url: newPath })
-      .eq("id", user_id);
+      .eq("id", user.current.id);
     if (error) {
       triggerAlert("Profile update failed");
       return;

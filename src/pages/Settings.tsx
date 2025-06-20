@@ -80,12 +80,7 @@ export default function Settings() {
           className="grid grid-cols-1 gap-y-4 place-items-center"
         >
           <div className="rounded width-[30%] height-[30%]">
-            <Avatar
-              url={avatar_url}
-              onUpload={(event, url: string) => {
-                updateProfile(event, url);
-              }}
-            />
+            <Avatar />
           </div>
 
           <span className="ml-3 text-xl font-medium text-green-5 ">

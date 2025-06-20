@@ -9,9 +9,8 @@ export default function ProfileIcon(props: {
   setUserMenu: any;
   session: Session | undefined;
 }) {
-  const [avatarUrl, setAvatarUrl] = useState<string>("");
   const navigate = useNavigate();
-  const { avatarUrl: pfpUrl } = useUser();
+  const { avatarUrl } = useUser();
   const handleClick = () => {
     const isBelowBreakpoint = window.matchMedia("(max-width: 1023px)").matches;
     if (isBelowBreakpoint) {
@@ -71,7 +70,7 @@ export default function ProfileIcon(props: {
             <span className="sr-only">Open user menu</span>
             <img
               className="h-8 w-8 rounded-full object-cover"
-              src={pfpUrl || "/default_pfp.webp"}
+              src={avatarUrl || "/default_pfp.webp"}
               alt=""
             ></img>
           </button>
