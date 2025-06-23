@@ -3,6 +3,7 @@ import simplifyText from "../api/simplify";
 import supabase from "../api/supabaseClient";
 import Dropdown from "../components/Dropdown";
 import { Link } from "react-router-dom";
+import parser from '../api/fileParser';
 import { useAlert } from "../contexts/AlertContext";
 
 function Homepage() {
@@ -17,6 +18,12 @@ function Homepage() {
   const [upload, setUpload] = useState(false);
   const [view, setView] = useState(false);
   const { triggerAlert } = useAlert();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileButtonClick = () => {
+    fileInputRef.current?.click();
+  };
 
   useEffect(() => {
     const loadToken = async () => {
@@ -170,6 +177,47 @@ function Homepage() {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] ?? null;
+    setFile(selectedFile);
+
+    if (!selectedFile) {
+      return;
+    }
+    if (selectedFile.type === "application/pdf") {
+      // Handle PDF files
+      parser.readPdf(selectedFile)
+        .then((text) => {
+          updateDisplayText(text);
+        })
+        .catch((error) => {
+          console.error("Error reading PDF file:", error);
+          triggerAlert("Error reading PDF file");
+        });
+    } else if (
+      selectedFile.type ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      // Handle DOCX files
+      parser.readDocx(selectedFile)
+        .then((text) => {
+          updateDisplayText(text);
+        })
+        .catch((error) => {
+          console.error("Error reading DOCX file:", error);
+          triggerAlert("Error reading DOCX file");
+        });
+    }else if (selectedFile.type === "text/plain") {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const fileText = reader.result as string;
+        updateDisplayText(fileText); // this will send file text to the same simplification function
+      };
+      reader.readAsText(selectedFile); // handles .txt, fallback for others
+    }
+    setView(true);
+  };
+
   return (
     <div className="min-h-screen flex y-overflow-auto justify-center text-center ">
       <div className="self-center pt-[9vh]">
@@ -187,7 +235,20 @@ function Homepage() {
           <>
             {!view ? (
               <div className=" grid grid-flow-col grid-rows-1">
-                <button className={btnUnclicked}>File Upload</button>
+                <input
+                  ref={fileInputRef}
+                  className="hidden absolute"
+                  type="file"
+                  onChange={handleFileChange}
+                  accept=".txt,.pdf,.docx"
+                />
+                <button
+                  className={btnUnclicked}
+                  onClick={handleFileButtonClick}
+                >
+                  File Upload
+                </button>
+
                 <button
                   className={btnUnclicked}
                   onClick={() => {

@@ -37,10 +37,7 @@ export default function Avatar() {
           {uploading ? "Uploading ..." : "Upload"}
         </label>
         <input
-          style={{
-            visibility: "hidden",
-            position: "absolute",
-          }}
+          className="hidden absolute"
           type="file"
           id="single"
           accept="image/*"
